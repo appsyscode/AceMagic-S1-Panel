@@ -16,11 +16,11 @@ var _last_sampled = 0;
 var _history = [];
 
 function read_file(path) {
-  
+
     return new Promise((fulfill, reject) => {
 
         fs.readFile(path, 'utf8', (err, data) => {
-            
+
             if (err) {
                 return reject(err);
             }
@@ -31,7 +31,7 @@ function read_file(path) {
 }
 
 function file_exists(path) {
-    
+
     return new Promise(fulfill => {
 
         fs.stat(path, (err, stats) => {
@@ -49,7 +49,7 @@ function power_usage() {
 
     return new Promise(fulfill => {
 
-        const _base_dir = '/sys/class/powercap/'; 
+        const _base_dir = '/sys/class/powercap/';
 
         fs.readdir(_base_dir, (err, dir) => {
 
@@ -82,7 +82,7 @@ function power_usage() {
                 const _current = [];
 
                 results.forEach(each => {
-                   
+
                     if (each) {
                         _current.push(Number(each));
                     }
@@ -90,7 +90,7 @@ function power_usage() {
 
 
                 if (_previous) {
-                    
+
                     var _watts = 0.0;
 
                     for (var i = 0; i < _current.length; i++) {
@@ -105,9 +105,9 @@ function power_usage() {
                 }
 
                 _previous = _current;
-        
+
                 fulfill(_response);
-            
+
             }, err => {
 
                 if (!_fault) {
@@ -137,27 +137,27 @@ function sample(rate, format) {
 
         _cpu_promise.then(result => {
 
-		    if (!result) {
-    const os = require('os');
-    const loadavg = os.loadavg()[0];
-    const cores = os.cpus().length;
+            if (!result) {
+                const os = require('os');
+                const loadavg = os.loadavg()[0];
+                const cores = os.cpus().length;
 
-    // Alap idle fogyasztás (rendszer + háttér)
-    let base = 5;
+                // Alap idle fogyasztás (rendszer + háttér)
+                let base = 5;
 
-    // Terheléshez arányos növekedés magokkal
-    let dynamic = loadavg * cores * 3.5;
+                // Terheléshez arányos növekedés magokkal
+                let dynamic = loadavg * cores * 3.5;
 
-    // Becsült teljesítmény wattban, korlátozva ésszerű tartományra
-    let estimated = Math.max(base, Math.min(base + dynamic, cores * 10));
+                // Becsült teljesítmény wattban, korlátozva ésszerű tartományra
+                let estimated = Math.max(base, Math.min(base + dynamic, cores * 10));
 
-    logger.warn(`⚡ cpu_power: powercap nem elérhető — becsült érték ${estimated.toFixed(1)} W`);
-    fulfill({ value: `${estimated.toFixed(1)} W`, min: 0, max: cores * 10 });
-    return;
-}
+                logger.warn(`⚡ cpu_power: powercap nem elérhető — becsült érték ${estimated.toFixed(1)} W`);
+                fulfill({ value: `${estimated.toFixed(1)} W`, min: 0, max: cores * 10 });
+                return;
+            }
 
             if (result && _dirty) {
-                
+
                 var _seconds = _diff / 1000;
 
                 if (!_history.length) {
@@ -165,39 +165,39 @@ function sample(rate, format) {
                     for (var i = 0; i < _max_points; i++) {
                         _history.push(0);
                     }
-                } 
+                }
 
                 if (_seconds > 1) {
                     result.watts = result.watts / _seconds;
-					
+
                 }
 
                 _history.push(result.watts.toFixed(0));
                 _history.shift();
 
-            // --- ⚙️ Fallback becslés, ha nincs powercap támogatás ---
-			if (!result.watts || isNaN(result.watts) || result.watts === 0) {
-    const os = require('os');
-    const loadavg = os.loadavg()[0];
-    const cores = os.cpus().length;
+                // --- ⚙️ Fallback becslés, ha nincs powercap támogatás ---
+                if (!result.watts || isNaN(result.watts) || result.watts === 0) {
+                    const os = require('os');
+                    const loadavg = os.loadavg()[0];
+                    const cores = os.cpus().length;
 
-    // Alap idle fogyasztás (rendszer + háttér)
-    let base = 5;
+                    // Alap idle fogyasztás (rendszer + háttér)
+                    let base = 5;
 
-    // Terheléshez arányos növekedés magokkal
-    let dynamic = loadavg * cores * 3.5;
+                    // Terheléshez arányos növekedés magokkal
+                    let dynamic = loadavg * cores * 3.5;
 
-    // Becsült teljesítmény wattban, de korlátozva egy ésszerű tartományra
-    let estimated = Math.max(base, Math.min(base + dynamic, cores * 10));
+                    // Becsült teljesítmény wattban, de korlátozva egy ésszerű tartományra
+                    let estimated = Math.max(base, Math.min(base + dynamic, cores * 10));
 
-    console.warn(`⚡ Becslés alapján CPU teljesítmény: ${estimated.toFixed(1)} W`);
-    result.watts = estimated.toFixed(1);
-}
-            // --- vége fallback ---
+                    console.warn(`⚡ Becslés alapján CPU teljesítmény: ${estimated.toFixed(1)} W`);
+                    result.watts = estimated.toFixed(1);
+                }
+                // --- vége fallback ---
             }
 
-            const _output = format.replace(/{(\d+)}/g, function (match, number) { 
-        
+            const _output = format.replace(/{(\d+)}/g, function (match, number) {
+
                 switch (number) {
 
                     case '0':
@@ -205,11 +205,11 @@ function sample(rate, format) {
 
                     case '1':
                         return _history.join();
-                        
+
                     default:
                         return 'null';
                 }
-            }); 
+            });
 
             fulfill({ value: _output, min: 0, max: 28 });
         });
@@ -217,13 +217,13 @@ function sample(rate, format) {
 }
 
 function init(config) {
-    
+
     if (config) {
         _max_points = config.max_points || 10;
     }
 
     logger.info('initialize: cpu power max points are set to ' + _max_points);
-    
+
     return 'cpu_power';
 }
 
@@ -239,7 +239,7 @@ function settings() {
         description: 'cpu power monitor',
         icon: 'pi-bolt',
         multiple: false,
-        ident: [],        
+        ident: [],
         fields: [
             { name: 'max_points', type: 'number', value: 300 },
         ]

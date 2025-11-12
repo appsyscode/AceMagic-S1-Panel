@@ -26,11 +26,11 @@ var _swap_total = 0;
 var _previous = null;
 
 function read_file(path) {
-  
+
     return new Promise((fulfill, reject) => {
 
         fs.readFile(path, 'utf8', (err, data) => {
-            
+
             if (err) {
                 return reject(err);
             }
@@ -91,13 +91,13 @@ function calc_memory_usage(current) {
     const _current_used = _current_total - _current_free;
     const _active = _current_used - _current_cached;
     const _swap_used = _current_swap_total - _current_swap_free;
-    
+
     return {
         total: _current_total * 1024,
         free: _current_free * 1024,
         cached: _current_cached * 1024,
         active: _active * 1024,
-        usage:  ((_active / _current_total) * 100.0).toFixed(2),
+        usage: ((_active / _current_total) * 100.0).toFixed(2),
         swap_total: _current_swap_total * 1024,
         swap_used: _swap_used * 1024,
         swap: ((_swap_used / _current_swap_total) * 100.0).toFixed(2)
@@ -171,31 +171,31 @@ function sample(rate, format) {
             _mem_promise = mem_usage();
             _dirty = true;
         }
-		_mem_promise.then(result => {
-    if (result && typeof result.total === 'number' && result.total > 0) {
-        if (_total_memory != result.total) {
-            _total_memory = result.total;
-            logger.info('memory sensor: total ram detected ' + _total_memory + ' GB');
-        }
+        _mem_promise.then(result => {
+            if (result && typeof result.total === 'number' && result.total > 0) {
+                if (_total_memory != result.total) {
+                    _total_memory = result.total;
+                    logger.info('memory sensor: total ram detected ' + _total_memory + ' GB');
+                }
 
-        if (_swap_total != result.swap_total) {
-            _swap_total = result.swap_total;
-            logger.info('memory sensor: total swap detected ' + _swap_total + ' GB');
-        }
+                if (_swap_total != result.swap_total) {
+                    _swap_total = result.swap_total;
+                    logger.info('memory sensor: total swap detected ' + _swap_total + ' GB');
+                }
 
-        record_sample(_free_history, result.free, _max_points);
-        record_sample(_cache_history, result.cached, _max_points);
-        record_sample(_active_history, result.active, _max_points);
-        record_sample(_usage_history, result.usage, _max_points);
-        record_sample(_used_swap_history, result.swap_used, _max_points);
-        record_sample(_swap_history, result.swap, _max_points);
-    } else {
-       // logger.warn('⚠️ memory sensor: skipping invalid or empty result');
-    }
+                record_sample(_free_history, result.free, _max_points);
+                record_sample(_cache_history, result.cached, _max_points);
+                record_sample(_active_history, result.active, _max_points);
+                record_sample(_usage_history, result.usage, _max_points);
+                record_sample(_used_swap_history, result.swap_used, _max_points);
+                record_sample(_swap_history, result.swap, _max_points);
+            } else {
+                // logger.warn('⚠️ memory sensor: skipping invalid or empty result');
+            }
             var _max = 0;
 
-            const _output = format.replace(/{(\d+)}/g, function (match, number) { 
-        
+            const _output = format.replace(/{(\d+)}/g, function (match, number) {
+
                 switch (number) {
                     case '0':
                         return _total_memory;
@@ -229,53 +229,53 @@ function sample(rate, format) {
                     case '9':
                         _max = _total_memory;
                         return _cache_history.join();
-                                                    
+
                     case '10':
-    _max = _total_memory;
-    return (_total_memory / 1024 / 1024).toFixed(2);
+                        _max = _total_memory;
+                        return (_total_memory / 1024 / 1024).toFixed(2);
                     case '11':
                         _max = _total_memory;
                         return _active_history.join();
-                                                     
+
                     case '12':
-    _max = 100;
-    const usedKB = _usage_history[_usage_history.length - 1] || 0;
-    const totalKB = _total_memory || 1; // védelem null ellen
-    const percent = (usedKB / totalKB) * 100;
-    return percent.toFixed(2);
+                        _max = 100;
+                        const usedKB = _usage_history[_usage_history.length - 1] || 0;
+                        const totalKB = _total_memory || 1; // védelem null ellen
+                        const percent = (usedKB / totalKB) * 100;
+                        return percent.toFixed(2);
                     case '13':
                         _max = _swap_total;
-                        return _used_swap_history.join();                        
+                        return _used_swap_history.join();
 
                     case '14':
-    _max = _total_memory;
-    var _used_kb = _usage_history[_usage_history.length - 1] || 0;
-    return (_used_kb / 1024 / 1024).toFixed(2); // GB-ban visszaadva
+                        _max = _total_memory;
+                        var _used_kb = _usage_history[_usage_history.length - 1] || 0;
+                        return (_used_kb / 1024 / 1024).toFixed(2); // GB-ban visszaadva
                     case '15':
                         return format_bytes(_used_swap_history[_used_swap_history.length - 1]);
 
                     default:
                         return 'null';
                 }
-            }); 
+            });
 
             fulfill({
-    value: _output.trim(),
-    min: 0,
-    max: (_max / 1024 / 1024).toFixed(2)
-});
+                value: _output.trim(),
+                min: 0,
+                max: (_max / 1024 / 1024).toFixed(2)
+            });
         });
     });
 }
 
 function init(config) {
-    
+
     if (config) {
         _max_points = config.max_points || 10;
     }
 
     logger.info('initialize: memory sensor max points are set to ' + _max_points);
-    
+
     return 'memory';
 }
 
@@ -289,9 +289,9 @@ function settings() {
     return {
         name: 'memory',
         description: 'memory monitor',
-        icon: 'pi-chart-pie',        
+        icon: 'pi-chart-pie',
         multiple: false,
-        ident: [],        
+        ident: [],
         fields: [
             { name: 'max_points', type: 'number', value: 300 },
         ]

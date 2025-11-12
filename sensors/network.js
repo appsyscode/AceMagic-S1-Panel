@@ -6,7 +6,7 @@
  */
 const threads = require('worker_threads');
 
-const logger  = require('../logger');
+const logger = require('../logger');
 
 function record_sample(array, value, max_points) {
 
@@ -209,22 +209,22 @@ function init(config) {
 }
 
 function stop(config) {
-    
+
     return new Promise(fulfill => {
 
         if (config && config._private) {
-            
+
             const _private = config._private;
 
             if (_private.worker) {
 
                 // notify thread to exit
                 _private.worker.postMessage({ stop: true });
-                
+
                 // wait for at least 10 second to kill it
                 const _timer = setTimeout(() => {
                     _private.worker.terminate().then(() => {
-                        logger.info('killed network thread for ' + _private.name);                
+                        logger.info('killed network thread for ' + _private.name);
                         fulfill();
                     });
                 }, 10000);
@@ -233,7 +233,7 @@ function stop(config) {
                 _private.worker.on('exit', () => {
                     clearTimeout(_timer);
                     logger.info('stopped network thread for ' + _private.name);
-                    fulfill();                
+                    fulfill();
                 });
             }
             else {
@@ -255,7 +255,7 @@ function settings() {
         description: 'monitor nic statistics',
         icon: 'pi-wifi',
         multiple: true,
-        ident: [ 'interface' ],   // which fields will change the identity of the sensor
+        ident: ['interface'],   // which fields will change the identity of the sensor
         fields: [
             { name: 'max_points', type: 'number', value: 300 },
             { name: 'interface', type: 'string', value: 'enp2s0' },

@@ -17,11 +17,11 @@ var _history = [];
 var _previous = null;
 
 function read_file(path) {
-  
+
     return new Promise((fulfill, reject) => {
 
         fs.readFile(path, 'utf8', (err, data) => {
-            
+
             if (err) {
                 return reject(err);
             }
@@ -32,7 +32,7 @@ function read_file(path) {
 }
 
 function calc_cpu_usage(previous, current) {
-    
+
     var _total_diff = 0;
     var _major_diff = 0;
 
@@ -41,7 +41,7 @@ function calc_cpu_usage(previous, current) {
         const _current_value = Number(current[i]);
         const _previous_value = Number(previous[i]);
 
-        _total_diff += _current_value - _previous_value; 
+        _total_diff += _current_value - _previous_value;
         if (i < 4) {
             _major_diff += _current_value - _previous_value;
         }
@@ -58,18 +58,18 @@ function cpu_usage() {
 
             const _response = { usage: 0.00 };
             const _current = cpuinfo.match(/^cpu\s\s(\d+)\s(\d+)\s(\d+)\s(\d+)\s(\d+)\s(\d+)\s(\d+)\s(\d+)\s(\d+)\s(\d+)/);
-            
+
             if (_previous) {
                 var _cpu_usage = calc_cpu_usage(_previous, _current);
                 _response.usage = _cpu_usage;
             }
 
             _previous = _current;
-            
+
             fulfill(_response);
-        
+
         }, err => {
-            
+
             if (!_fault) {
                 logger.error('cpu_usage: failed to read /proc/stat: ' + err);
                 _fault = true;
@@ -99,32 +99,32 @@ function sample(rate, format) {
         _cpu_promise.then(result => {
 
             if (result && _dirty) {
-                
+
                 if (!_history.length) {
 
                     for (var i = 0; i < _max_points; i++) {
                         _history.push(0);
                     }
-                } 
+                }
 
                 _history.push(result.usage.toFixed(0));
                 _history.shift();
             }
 
-            const _output = format.replace(/{(\d+)}/g, function (match, number) { 
-        
+            const _output = format.replace(/{(\d+)}/g, function (match, number) {
+
                 switch (number) {
 
                     case '0':
                         return _history[_history.length - 1];
-                        
+
                     case '1':
                         return _history.join();
 
                     default:
                         return 'null';
                 }
-            }); 
+            });
 
             fulfill({ value: _output, min: 0, max: 100 });
         });
@@ -132,13 +132,13 @@ function sample(rate, format) {
 }
 
 function init(config) {
-    
+
     if (config) {
         _max_points = config.max_points || 10;
     }
 
     logger.info('initialize: cpu sensor max points are set to ' + _max_points);
-    
+
     return 'cpu_usage';
 }
 

@@ -5,16 +5,16 @@
  * Copyright (c) 2024-2025 Tomasz Jaworski
  * GPL-3 Licensed
  */
-const threads     = require('worker_threads');
-const fs          = require('fs');
-const path        = require('path');
-const http        = require('http');
+const threads = require('worker_threads');
+const fs = require('fs');
+const path = require('path');
+const http = require('http');
 
-const express     = require('express');
+const express = require('express');
 const node_canvas = require('canvas');
 
-const logger      = require('./logger');
-const api         = require('./api');
+const logger = require('./logger');
+const api = require('./api');
 
 const home_dir = process.env.S1PANEL_CONFIG || __dirname;
 const font_root = path.join('usr', 'share', 'fonts');
@@ -31,7 +31,7 @@ function lcd_redraw(state, imageData) {
 
     const pixelData = new Uint16Array(imageData.data);
 
-    state.lcd_thread.postMessage({ type: 'redraw', pixelData}, [pixelData.buffer]);
+    state.lcd_thread.postMessage({ type: 'redraw', pixelData }, [pixelData.buffer]);
 }
 
 function lcd_update(state, rect, imageData) {
@@ -348,7 +348,7 @@ function next_draw_widgets(context, state, config, widgets, index, total, fulfil
             }
         }
 
-       return _sensor_reading.then(sensor => {
+        return _sensor_reading.then(sensor => {
 
             const _widget = state.widgets[_widget_config.name];
             const _value = sensor ? sensor.value : _widget_config.value;
@@ -576,11 +576,13 @@ function initialize(state, config, theme) {
 
             logger.info('initialize: sensor ' + _name + ' loaded...');
 
-            state.sensors[_name] = { config: _config, name: _name, info: _info, sample: (rate, format) => {
-                return _module.sample(rate, format, _config);
-            }, stop: () => {
-                return _module.stop(_config);
-            }};
+            state.sensors[_name] = {
+                config: _config, name: _name, info: _info, sample: (rate, format) => {
+                    return _module.sample(rate, format, _config);
+                }, stop: () => {
+                    return _module.stop(_config);
+                }
+            };
         }
     });
 
@@ -672,7 +674,7 @@ function register_fonts() {
 
     return new Promise(fulfill => {
 
-        const _fonts = [ 
+        const _fonts = [
             // Arial → Liberation Sans
             { path: '/truetype/liberation/LiberationSans-Regular.ttf', face: { family: 'Arial', weight: 'normal', style: 'normal' } },
             { path: '/truetype/liberation/LiberationSans-Bold.ttf', face: { family: 'Arial', weight: 'bold', style: 'normal' } },
@@ -712,10 +714,10 @@ function register_fonts() {
         var _promises = [];
 
         logger.info('initialize: starting fonts registration from ' + font_dir);
-        
+
         _fonts.forEach(font => {
 
-            _promises.push(load_panel_font(font));            
+            _promises.push(load_panel_font(font));
         });
 
         return Promise.all(_promises).then(fulfill, fulfill);
@@ -728,11 +730,11 @@ function main() {
     const _config_file = (_args.length > 0) ? _args[0] : path.join(home_dir, 'config.json'); // {dir}/config.json
 
     logger.info('config ' + _config_file);
-    
+
     load_config(_config_file).then(config => {
-        
+
         const _theme_file = path.join(home_dir, config.theme); // {dir}/themes/simple_demo/portrait_simple.json
-        
+
         logger.info('theme ' + _theme_file);
 
         load_config(_theme_file).then(theme => {
@@ -745,42 +747,42 @@ function main() {
 
                 const _state = {
 
-                    config_file        : _config_file,
+                    config_file: _config_file,
 
-                    widgets            : {},
-                    sensors            : {},
+                    widgets: {},
+                    sensors: {},
 
-                    redraw_want        : 1,
-                    redraw_count       : 0,
+                    redraw_want: 1,
+                    redraw_count: 0,
 
-                    drawing            : false,             // drawing in progress
-                    changes            : [],                // screen update regions
-                    change_count       : 0,                 // screen update count
+                    drawing: false,             // drawing in progress
+                    changes: [],                // screen update regions
+                    change_count: 0,                 // screen update count
 
-                    output_canvas      : _output_canvas,
-                    output_context     : _output_canvas.getContext('2d', { pixelFormat: config.canvas.pixel }),
-                    active_context     : 0,
-                    canvas_context     : [ _canvas1, _canvas2 ],
+                    output_canvas: _output_canvas,
+                    output_context: _output_canvas.getContext('2d', { pixelFormat: config.canvas.pixel }),
+                    active_context: 0,
+                    canvas_context: [_canvas1, _canvas2],
 
-                    change_screen      : 0,                 // index of forced screen change
-                    screen_paused      : false,             // pause screen change
-                    screen_index       : 0,                 // array index into screens, not screen id
-                    screen_start       : get_hr_time(),
+                    change_screen: 0,                 // index of forced screen change
+                    screen_paused: false,             // pause screen change
+                    screen_index: 0,                 // array index into screens, not screen id
+                    screen_start: get_hr_time(),
 
-                    update_orientation : true,
-                    update_led         : true,
+                    update_orientation: true,
+                    update_led: true,
 
-                    wallpaper_image    : null,
+                    wallpaper_image: null,
 
-                    led_thread         : new threads.Worker('./led_thread.js', { workerData: config.led_config }),
-                    lcd_thread         : new threads.Worker('./lcd_thread.js', { workerData: { device: config.device, poll: config.poll, refresh: config.refresh, heartbeat: config.heartbeat }}),
+                    led_thread: new threads.Worker('./led_thread.js', { workerData: config.led_config }),
+                    lcd_thread: new threads.Worker('./lcd_thread.js', { workerData: { device: config.device, poll: config.poll, refresh: config.refresh, heartbeat: config.heartbeat } }),
 
-                    unsaved_changes    : false,
+                    unsaved_changes: false,
 
                     // helpers to keep things consistant between here and api
-                    pending_redraw     : (state) => state.redraw_count < state.redraw_want,
-                    force_redraw       : (state) => state.redraw_want++,
-                    done_redraw        : (state) => state.redraw_count < state.redraw_want ? state.redraw_count++ : state.redraw_count
+                    pending_redraw: (state) => state.redraw_count < state.redraw_want,
+                    force_redraw: (state) => state.redraw_want++,
+                    done_redraw: (state) => state.redraw_count < state.redraw_want ? state.redraw_count++ : state.redraw_count
                 };
 
                 initialize(_state, config, theme).then(() => {

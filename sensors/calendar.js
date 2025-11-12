@@ -13,14 +13,14 @@ function pad(n, width, z) {
     return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
 }
 
-const _weekday = [ 'Vasarnap', 'Hetfo', 'Kedd', 'Szerda', 'Csutortok', 'Pentek', 'Szombat'];
+const _weekday = ['Vasarnap', 'Hetfo', 'Kedd', 'Szerda', 'Csutortok', 'Pentek', 'Szombat'];
 const _months = [
-  'jan', 'febr', 'márc', 'ápr',
-  'máj', 'jún', 'júl', 'aug',
-  'szept', 'okt', 'nov', 'dec'
+    'jan', 'febr', 'márc', 'ápr',
+    'máj', 'jún', 'júl', 'aug',
+    'szept', 'okt', 'nov', 'dec'
 ];
 function get_ordinal_suffix(number) {
-    
+
     if (number >= 11 && number <= 13) {
         return number + 'th';
     }
@@ -49,13 +49,13 @@ function sample(rate, format) {
             _value = new Date();
         }
 
-        var _output = format.replace(/{(\d+)}/g, function (match, number) { 
+        var _output = format.replace(/{(\d+)}/g, function (match, number) {
 
             const _month = 1 + _value.getMonth();
             const _day = _value.getDate();
             const _full_year = _value.getFullYear();
             const _short_year = _value.getFullYear().toString().substring(2);
-    
+
             switch (number) {
                 case '0':   // M/D/YY 
                     return _month + '/' + _day + '/' + _short_year;
@@ -76,15 +76,15 @@ function sample(rate, format) {
                 case '8':   // 4 digit year
                     return _value.getFullYear();
                 case '9':   // get month
-                    return 1 +_value.getMonth();
+                    return 1 + _value.getMonth();
                 case '10':  // 2 digit year
-                    return _short_year;                               
+                    return _short_year;
                 case '11':  // dot notation
                     return _full_year + '.' + _month + '.' + _day;
                 default:
-                    return 'undefined'; 
+                    return 'undefined';
             }
-        }); 
+        });
 
         fulfill({ value: _output, min: 0, max: 0 });
     });
@@ -104,7 +104,7 @@ function settings() {
     return {
         name: 'calendar',
         description: 'current date info',
-        icon: 'pi-calendar',        
+        icon: 'pi-calendar',
         multiple: false,
         ident: [],
         fields: []
