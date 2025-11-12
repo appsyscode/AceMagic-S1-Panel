@@ -1,0 +1,123 @@
+{
+  "orientation": "portrait",
+  "canvas": { "width": 170, "height": 320 },
+  "refresh": "update",
+  "screens": [
+    {
+      "id": 1,
+      "name": "NAS Monitor",
+      "background": "#000000",
+      "duration": 60000,
+      "led_config": { "theme": 4, "intensity": 3, "speed": 3 },
+      "widgets": [
+        {
+          "id": 1,
+          "name": "text",
+          "rect": { "x": 0, "y": 8, "width": 170, "height": 30 },
+          "sensor": true,
+          "value": "clock",
+          "format": "{1} {3}",
+          "refresh": 1000,
+          "font": "24px Arial",
+          "color": "#00ff66",
+          "align": "center"
+        },
+        {
+          "id": 2,
+          "name": "text",
+          "rect": { "x": 0, "y": 38, "width": 170, "height": 20 },
+          "sensor": true,
+          "value": "calendar",
+          "format": "{4}, {6}",
+          "refresh": 60000,
+          "font": "15px Arial",
+          "color": "#ffffff",
+          "align": "center"
+        },
+        {
+          "id": 3,
+          "name": "doughnut_chart",
+          "used": "#00ff66",
+          "free": "#1a1a1a",
+          "rect": { "x": 50, "y": 62, "width": 70, "height": 70 },
+          "sensor": true,
+          "value": "cpu_usage",
+          "format": "{0}",
+          "refresh": 1000
+        },
+        {
+          "id": 4,
+          "name": "text",
+          "rect": { "x": 0, "y": 135, "width": 170, "height": 20 },
+          "sensor": true,
+          "value": "cpu_usage",
+          "format": "CPU: {0}%",
+          "refresh": 1000,
+          "font": "17px Arial",
+          "color": "#00ff66",
+          "align": "center"
+        },
+        {
+          "id": 5,
+          "name": "text",
+          "rect": { "x": 50, "y": 165, "width": 80, "height": 80 },
+          "sensor": true,
+  "value": "cpu_power",
+  "format": "{0} W",
+  "refresh": 1000,
+  "font": "22px Arial",
+  "color": "#ffcc00",
+  "align": "center"
+        },
+        {
+          "id": 6,
+          "name": "text",
+          "rect": { "x": 0, "y": 200, "width": 170, "height": 20 },
+          "sensor": true,
+          "value": "memory",
+		  "format": "{14} / {10} GB",
+          "refresh": 1000,
+          "font": "18px Arial",
+          "color": "#00ccff",
+          "align": "center"
+        },
+        {
+          "id": 7,
+          "name": "text",
+          "rect": { "x": 0, "y": 232, "width": 170, "height": 20 },
+          "sensor": true,
+          "value": "cpu_temp",
+          "format": "{0}°C",
+          "refresh": 2000,
+          "font": "22px Arial",
+          "color": "#FFF300",
+          "align": "center"
+        },
+        {
+  "id": 8,
+  "name": "text",
+  "rect": { "x": 0, "y": 265, "width": 170, "height": 18 },
+  "sensor": true,
+  "value": "network_eth0",
+  "format": "↓ {15}",
+  "refresh": 1000,
+  "font": "20px Arial",
+  "color": "#83FFFF",
+  "align": "center"
+},
+{
+  "id": 9,
+  "name": "text",
+  "rect": { "x": 0, "y": 290, "width": 170, "height": 18 },
+  "sensor": true,
+  "value": "network_eth0",
+  "format": "↑ {16}",
+  "refresh": 1000,
+  "font": "20px Arial",
+  "color": "#4CED00",
+  "align": "center"
+}
+      ]
+    }
+  ]
+}
